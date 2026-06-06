@@ -1,0 +1,37 @@
+<div class="checkout-container">
+  <h2>🛒 Resumen de Compra Directa</h2>
+  <p class="product-badge">Procesando Compra para Artículo Código: <strong>{{ productoId() }}</strong></p>
+
+  <div *ngIf="compraExitosa()" class="success-alert">
+    <h3>¡Transacción Exitosa!</h3>
+    <p>El pago simulado ha sido aprobado. Se ha descontado 1 unidad del inventario local (.json).</p>
+    <button (click)="volverAlCatalogo()">Volver a la Tienda</button>
+  </div>
+
+  <form *ngIf="!compraExitosa()" #formularioPago="ngForm" (ngSubmit)="procesarPago(formularioPago)" class="payment-form">
+    <div class="form-group">
+      <label for="titular">Nombre del Titular</label>
+      <input type="text" id="titular" name="titular" [(ngModel)]="datosPago.nombreTitular" required #titular="ngModel" placeholder="Juan Pérez">
+      <small *ngIf="titular.invalid && titular.touched" class="error-msg">El nombre es obligatorio.</small>
+    </div>
+
+    <div class="form-group">
+      <label for="tarjeta">Número de Tarjeta (Simulado)</label>
+      <input type="text" id="tarjeta" name="tarjeta" [(ngModel)]="datosPago.numeroTarjeta" required minlength="16" maxlength="16" #tarjeta="ngModel" placeholder="4555123456789012">
+      <small *ngIf="tarjeta.invalid && tarjeta.touched" class="error-msg">Debe ingresar los 16 dígitos.</small>
+    </div>
+
+    <div class="row-inputs">
+      <div class="form-group">
+        <label for="exp">Vencimiento</label>
+        <input type="text" id="exp" name="exp" [(ngModel)]="datosPago.expiracion" required placeholder="MM/AA" #exp="ngModel">
+      </div>
+      <div class="form-group">
+        <label for="cvv">CVV</label>
+        <input type="password" id="cvv" name="cvv" [(ngModel)]="datosPago.cvv" required minlength="3" maxlength="3" placeholder="123" #cvv="ngModel">
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="formularioPago.invalid" class="btn-submit">Confirmar Pago Simulado</button>
+  </form>
+</div>

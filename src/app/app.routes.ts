@@ -1,10 +1,15 @@
 import { Routes } from '@angular/router';
+import { CompraArticuloComponent } from './components/compra-articulo/compra-articulo.component';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'compra/101',
     pathMatch: 'full',
+  },
+  {
+    path: 'compra/:id',
+    component: CompraArticuloComponent,
   },
   {
     path: 'login',
