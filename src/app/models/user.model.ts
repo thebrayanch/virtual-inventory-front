@@ -1,20 +1,12 @@
 export interface User {
-  id: string;
-  name: string;
+  id: number;
+  userName: string;
   email: string;
   password: string;
-  createdAt: string;
 }
 
 export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
+  token: string;
 }
 
 export interface AuthResponse {
@@ -22,3 +14,4 @@ export interface AuthResponse {
   message: string;
   user?: Omit<User, 'password'>;
 }
+

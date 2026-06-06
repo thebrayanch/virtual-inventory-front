@@ -6,6 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
 import { LoginService } from './services';
+import { AuthService } from '../../services/auth.service';
 import type { LoginRequest } from './models';
 
 @Component({
@@ -16,6 +17,7 @@ import type { LoginRequest } from './models';
 })
 export class LoginComponent {
   private readonly loginService = inject(LoginService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   email = '';
@@ -38,16 +40,14 @@ export class LoginComponent {
     this.loginService.execute(request).subscribe({
       next: (res) => {
         this.loading = false;
+        this.authService.setToken(res.token);
 
-        if (res.success) {
-          void this.router.navigate(['/']);
-        } else {
-          this.error = res.message;
-        }
+        const redirect = this.router.parseUrl(this.router.url).queryParamMap.get('redirect');
+        void this.router.navigateByUrl(redirect || '/');
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.error = 'Error de conexión con el servidor';
+        this.error = err.error?.message || 'Credenciales inválidas';
       },
     });
   }

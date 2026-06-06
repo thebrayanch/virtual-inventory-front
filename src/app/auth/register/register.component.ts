@@ -6,6 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
 import { RegisterService } from './services';
+import { AuthService } from '../../services/auth.service';
 import type { RegisterRequest } from './models';
 
 @Component({
@@ -16,6 +17,7 @@ import type { RegisterRequest } from './models';
 })
 export class RegisterComponent {
   private readonly registerService = inject(RegisterService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   name = '';
@@ -49,16 +51,12 @@ export class RegisterComponent {
     this.registerService.execute(request).subscribe({
       next: (res) => {
         this.loading = false;
-
-        if (res.success) {
-          void this.router.navigate(['/login']);
-        } else {
-          this.error = res.message;
-        }
+        this.authService.setToken(res.token);
+        void this.router.navigate(['/']);
       },
-      error: () => {
+      error: (err) => {
         this.loading = false;
-        this.error = 'Error de conexión con el servidor';
+        this.error = err.error?.message || 'Error al registrar';
       },
     });
   }
