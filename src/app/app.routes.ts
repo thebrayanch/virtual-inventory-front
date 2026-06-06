@@ -6,9 +6,4 @@ export const routes: Routes = [
     path: 'compra/:id', 
     component: CompraArticuloComponent 
   },
-  { 
-    path: '', 
-    redirectTo: 'compra/101', 
-    pathMatch: 'full' 
-  }
 ];
