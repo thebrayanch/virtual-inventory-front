@@ -1,17 +1,17 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
-import { LoginService } from './services';
+import { LoginService } from './services/login.service';
 import { AuthService } from '../../services/auth.service';
-import type { LoginRequest } from './models';
+import type { LoginRequest } from './models/login-request.interface';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, FormsModule, ButtonModule, InputTextModule, PasswordModule, MessageModule],
+  imports: [FormsModule, ButtonModule, InputTextModule, PasswordModule, MessageModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -20,22 +20,22 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  email = '';
-  password = '';
+  username = 'mor_2314';
+  password = '83r5^_';
   loading = false;
   error = '';
 
   submit(): void {
     this.error = '';
 
-    if (!this.email || !this.password) {
+    if (!this.username || !this.password) {
       this.error = 'Todos los campos son obligatorios';
       return;
     }
 
     this.loading = true;
 
-    const request: LoginRequest = { email: this.email, password: this.password };
+    const request: LoginRequest = { username: this.username, password: this.password };
 
     this.loginService.execute(request).subscribe({
       next: (res) => {
@@ -47,7 +47,11 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || 'Credenciales inválidas';
+        if (err.status === 401) {
+          this.error = err.error?.message || 'Credenciales inválidas';
+        } else {
+          this.error = 'Error de conexión. Verifica que el servidor esté encendido.';
+        }
       },
     });
   }

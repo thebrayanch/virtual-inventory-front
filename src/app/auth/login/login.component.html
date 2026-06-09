@@ -10,8 +10,8 @@
 
     <form #form="ngForm" (ngSubmit)="submit()">
       <div class="field">
-        <label for="email">Correo electrónico</label>
-        <input id="email" type="email" pInputText [(ngModel)]="email" name="email" required autocomplete="email" />
+        <label for="username">Nombre de usuario</label>
+        <input id="username" type="text" pInputText [(ngModel)]="username" name="username" required autocomplete="username" />
       </div>
 
       <div class="field">
@@ -29,9 +29,6 @@
       <p-button type="submit" label="Entrar" [loading]="loading" styleClass="w-full" />
     </form>
 
-    <p class="auth-link">
-      ¿No tienes cuenta?
-      <a routerLink="/register">Regístrate</a>
-    </p>
+
   </div>
 </div>
