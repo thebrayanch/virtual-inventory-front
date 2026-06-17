@@ -20,22 +20,22 @@ export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  username = 'mor_2314';
-  password = '83r5^_';
+  email = '';
+  password = '';
   loading = false;
   error = '';
 
   submit(): void {
     this.error = '';
 
-    if (!this.username || !this.password) {
+    if (!this.email || !this.password) {
       this.error = 'Todos los campos son obligatorios';
       return;
     }
 
     this.loading = true;
 
-    const request: LoginRequest = { username: this.username, password: this.password };
+    const request: LoginRequest = { email: this.email, password: this.password };
 
     this.loginService.execute(request).subscribe({
       next: (res) => {

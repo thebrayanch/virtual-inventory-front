@@ -32,9 +32,7 @@
     }
   ],
   "auth": {
-    "login": {
-        "token": "fake-token-1234567890"
-    }
+    "token": "fake-token-1234567890"
   },
   "categories": [
     {
