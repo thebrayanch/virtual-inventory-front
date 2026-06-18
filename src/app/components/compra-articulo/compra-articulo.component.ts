@@ -1,45 +1,74 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ProductsService } from '../../services/products.service';
+import type { Product } from '../../models/product.model';
 
 @Component({
   selector: 'app-compra-articulo',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, ButtonModule, InputTextModule, InputNumberModule],
   templateUrl: './compra-articulo.component.html',
-  styleUrl: './compra-articulo.component.css'
+  styleUrl: './compra-articulo.component.css',
 })
 export class CompraArticuloComponent implements OnInit {
-  protected productoId = signal<string | null>(null);
-  protected compraExitosa = signal<boolean>(false);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly productsService = inject(ProductsService);
 
-  protected datosPago = {
+  product = signal<Product | null>(null);
+  loading = signal(true);
+  quantity = 1;
+  compraExitosa = signal(false);
+  processing = signal(false);
+
+  datosPago = {
     nombreTitular: '',
     numeroTarjeta: '',
     expiracion: '',
-    cvv: ''
+    cvv: '',
   };
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
-
   ngOnInit(): void {
-    this.productoId.set(this.route.snapshot.paramMap.get('id'));
-  }
-
-  protected procesarPago(formulario: NgForm): void {
-    if (formulario.invalid) {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (!id) {
+      void this.router.navigate(['/articulos']);
       return;
     }
-    console.log('Procesando pago para el artículo ID:', this.productoId());
-    this.compraExitosa.set(true);
-    formulario.resetForm();
+
+    this.productsService.getById(id).subscribe({
+      next: (data) => {
+        this.product.set(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        void this.router.navigate(['/articulos']);
+      },
+    });
   }
 
-  protected volverAlCatalogo(): void {
-    this.router.navigate(['/']);
+  procesarPago(): void {
+    const p = this.product();
+    if (!p || this.processing()) return;
+
+    if (this.quantity > p.stok) return;
+
+    this.processing.set(true);
+
+    this.productsService.updateStock(p.id, p.stok - this.quantity).subscribe({
+      next: () => {
+        this.product.set({ ...p, stok: p.stok - this.quantity });
+        this.compraExitosa.set(true);
+        this.processing.set(false);
+      },
+      error: () => {
+        this.processing.set(false);
+      },
+    });
   }
 }

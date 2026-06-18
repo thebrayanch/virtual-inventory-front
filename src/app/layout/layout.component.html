@@ -1,0 +1,46 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-user">
+      <div class="user-avatar">
+        <i class="pi pi-user"></i>
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ auth.getCurrentUser()?.userName || 'Usuario' }}</span>
+        <span class="user-email">{{ auth.getCurrentUser()?.email || '' }}</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/articulos" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-box"></i>
+        <span>Artículos</span>
+      </a>
+      <a routerLink="/busqueda" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-search"></i>
+        <span>Búsqueda</span>
+      </a>
+      <a routerLink="/busqueda/avanzada" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-sliders-h"></i>
+        <span>Búsqueda Avanzada</span>
+      </a>
+      <a routerLink="/carrito" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-shopping-cart"></i>
+        <span>Carrito</span>
+        @if (cart.count() > 0) {
+          <span class="nav-badge">{{ cart.count() }}</span>
+        }
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="nav-item logout-btn" (click)="auth.logout()">
+        <i class="pi pi-sign-out"></i>
+        <span>Cerrar sesión</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>
