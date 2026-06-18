@@ -1,37 +1,96 @@
-<div class="checkout-container">
-  <h2>🛒 Resumen de Compra Directa</h2>
-  <p class="product-badge">Procesando Compra para Artículo Código: <strong>{{ productoId() }}</strong></p>
-
-  <div *ngIf="compraExitosa()" class="success-alert">
-    <h3>¡Transacción Exitosa!</h3>
-    <p>El pago simulado ha sido aprobado. Se ha descontado 1 unidad del inventario local (.json).</p>
-    <button (click)="volverAlCatalogo()">Volver a la Tienda</button>
-  </div>
-
-  <form *ngIf="!compraExitosa()" #formularioPago="ngForm" (ngSubmit)="procesarPago(formularioPago)" class="payment-form">
-    <div class="form-group">
-      <label for="titular">Nombre del Titular</label>
-      <input type="text" id="titular" name="titular" [(ngModel)]="datosPago.nombreTitular" required #titular="ngModel" placeholder="Juan Pérez">
-      <small *ngIf="titular.invalid && titular.touched" class="error-msg">El nombre es obligatorio.</small>
-    </div>
-
-    <div class="form-group">
-      <label for="tarjeta">Número de Tarjeta (Simulado)</label>
-      <input type="text" id="tarjeta" name="tarjeta" [(ngModel)]="datosPago.numeroTarjeta" required minlength="16" maxlength="16" #tarjeta="ngModel" placeholder="4555123456789012">
-      <small *ngIf="tarjeta.invalid && tarjeta.touched" class="error-msg">Debe ingresar los 16 dígitos.</small>
-    </div>
-
-    <div class="row-inputs">
-      <div class="form-group">
-        <label for="exp">Vencimiento</label>
-        <input type="text" id="exp" name="exp" [(ngModel)]="datosPago.expiracion" required placeholder="MM/AA" #exp="ngModel">
-      </div>
-      <div class="form-group">
-        <label for="cvv">CVV</label>
-        <input type="password" id="cvv" name="cvv" [(ngModel)]="datosPago.cvv" required minlength="3" maxlength="3" placeholder="123" #cvv="ngModel">
+<div class="purchase-page">
+  @if (loading()) {
+    <div class="loading">Cargando producto...</div>
+  } @else if (compraExitosa()) {
+    <div class="success">
+      <i class="pi pi-check-circle success-icon"></i>
+      <h2>¡Compra Exitosa!</h2>
+      <p>Se ha descontado {{ quantity }} unidad(es) del inventario.</p>
+      <div class="success-actions">
+        <button pButton label="Seguir comprando" icon="pi pi-arrow-left" [routerLink]="['/articulos']" class="p-button-outlined"></button>
+        <button pButton label="Ir al carrito" icon="pi pi-shopping-cart" [routerLink]="['/carrito']"></button>
       </div>
     </div>
+  } @else if (product(); as p) {
+    <div class="purchase-content">
+      <div class="product-preview">
+        <div class="preview-img">
+          <img [src]="p.image" [alt]="p.productName" />
+        </div>
+        <div class="preview-info">
+          <h1 class="product-name">{{ p.productName }}</h1>
+          <p class="product-desc">{{ p.description }}</p>
+          <p class="product-price">${{ p.price.toLocaleString() }}</p>
+          <p class="product-stock" [class.low]="p.stok < 10">
+            Stock disponible: {{ p.stok }} unidades
+          </p>
+        </div>
+      </div>
 
-    <button type="submit" [disabled]="formularioPago.invalid" class="btn-submit">Confirmar Pago Simulado</button>
-  </form>
+      <div class="purchase-form">
+        <h2>Detalles de Compra</h2>
+
+        <div class="field">
+          <label>Cantidad</label>
+          <p-inputNumber
+            [(ngModel)]="quantity"
+            [min]="1"
+            [max]="p.stok"
+            [showButtons]="true"
+            [step]="1"
+          />
+          <small *ngIf="quantity > p.stok" class="error">Stock insuficiente</small>
+        </div>
+
+        <div class="field">
+          <label>Nombre del Titular</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="datosPago.nombreTitular"
+            placeholder="Juan Pérez"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label>Número de Tarjeta</label>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="datosPago.numeroTarjeta"
+            placeholder="4555123456789012"
+            maxlength="16"
+            required
+          />
+        </div>
+
+        <div class="row-inputs">
+          <div class="field">
+            <label>Vencimiento</label>
+            <input type="text" pInputText [(ngModel)]="datosPago.expiracion" placeholder="MM/AA" required />
+          </div>
+          <div class="field">
+            <label>CVV</label>
+            <input type="password" pInputText [(ngModel)]="datosPago.cvv" placeholder="123" maxlength="3" required />
+          </div>
+        </div>
+
+        <div class="total-row">
+          <span>Total a pagar:</span>
+          <span class="total-amount">${{ (p.price * quantity).toLocaleString() }}</span>
+        </div>
+
+        <button
+          pButton
+          label="Confirmar Pago"
+          icon="pi pi-check"
+          [loading]="processing()"
+          [disabled]="!datosPago.nombreTitular || !datosPago.numeroTarjeta || quantity > p.stok"
+          (click)="procesarPago()"
+          class="w-full"
+        ></button>
+      </div>
+    </div>
+  }
 </div>

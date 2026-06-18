@@ -1,0 +1,80 @@
+<div class="search-page">
+  <h1 class="page-title">Búsqueda Avanzada</h1>
+
+  <div class="filters">
+    <div class="filter-row">
+      <div class="field">
+        <label>Nombre</label>
+        <input pInputText [(ngModel)]="filters.query" placeholder="Buscar por nombre..." />
+      </div>
+      <div class="field">
+        <label>Categoría</label>
+        <p-select
+          [(ngModel)]="filters.categoryId"
+          [options]="categories()"
+          optionLabel="categoryName"
+          optionValue="id"
+          placeholder="Todas las categorías"
+          class="w-full"
+          [showClear]="true"
+        />
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="field">
+        <label>Precio mínimo</label>
+        <p-inputNumber [(ngModel)]="filters.priceMin" [min]="0" placeholder="0" />
+      </div>
+      <div class="field">
+        <label>Precio máximo</label>
+        <p-inputNumber [(ngModel)]="filters.priceMax" [min]="0" placeholder="9999" />
+      </div>
+      <div class="field">
+        <label>Ordenar por precio</label>
+        <p-select
+          [(ngModel)]="filters.sortOrder"
+          [options]="[
+            { label: 'Menor a mayor', value: 'asc' },
+            { label: 'Mayor a menor', value: 'desc' }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          class="w-full"
+        />
+      </div>
+    </div>
+
+    <button pButton label="Buscar" icon="pi pi-search" (click)="search()" [loading]="loading()"></button>
+  </div>
+
+  @if (searched() && !loading()) {
+    @if (results().length === 0) {
+      <p class="empty">No se encontraron productos con esos filtros.</p>
+    } @else {
+      <p class="result-count">{{ results().length }} resultado(s)</p>
+      <div class="grid">
+        @for (product of results(); track product.id) {
+          <div class="card">
+            <div class="card-img">
+              <img [src]="product.image" [alt]="product.productName" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <h3 class="card-title">{{ product.productName }}</h3>
+              <p class="card-price">${{ product.price.toLocaleString() }}</p>
+              <p-tag
+                [value]="product.stok > 0 ? 'Stock: ' + product.stok : 'Agotado'"
+                [severity]="product.stok > 0 ? 'success' : 'danger'"
+                [rounded]="true"
+              />
+              <div class="card-actions">
+                <button pButton label="Comprar" icon="pi pi-shopping-cart" [routerLink]="['/compra', product.id]" class="p-button-sm"></button>
+                <button pButton label="Agregar" icon="pi pi-plus" class="p-button-sm p-button-outlined" (click)="addToCart(product)"></button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

@@ -40,7 +40,7 @@ export class LoginComponent {
     this.loginService.execute(request).subscribe({
       next: (res) => {
         this.loading = false;
-        this.authService.setToken(res.token);
+        this.authService.setUser(res.user);
 
         const redirect = this.router.parseUrl(this.router.url).queryParamMap.get('redirect');
         void this.router.navigateByUrl(redirect || '/');

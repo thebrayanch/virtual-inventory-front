@@ -1,0 +1,65 @@
+<div class="product-list">
+  <h1 class="page-title">Catálogo de Productos</h1>
+
+  @if (loading()) {
+    <div class="loading">Cargando productos...</div>
+  } @else {
+    <div class="grid">
+      @for (product of products(); track product.id) {
+        <div class="card">
+          <div class="card-img" (click)="openDetail(product)">
+            <img [src]="product.image" [alt]="product.productName" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">{{ product.productName }}</h3>
+            <p class="card-price">${{ product.price.toLocaleString() }}</p>
+            <div class="card-meta">
+              <p-tag
+                [value]="product.stok > 0 ? 'Stock: ' + product.stok : 'Agotado'"
+                [severity]="product.stok > 0 ? 'success' : 'danger'"
+                [rounded]="true"
+              />
+            </div>
+            <div class="card-actions">
+              <button
+                pButton
+                label="Comprar"
+                icon="pi pi-shopping-cart"
+                [routerLink]="['/compra', product.id]"
+                class="p-button-sm"
+              ></button>
+              <button
+                pButton
+                label="Agregar"
+                icon="pi pi-plus"
+                class="p-button-sm p-button-outlined"
+                (click)="addToCart(product)"
+              ></button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<p-dialog
+  [(visible)]="showDetail"
+  [header]="selectedProduct()?.productName"
+  [modal]="true"
+  [style]="{ width: '32rem' }"
+>
+  @if (selectedProduct(); as p) {
+    <div class="detail">
+      <div class="detail-img">
+        <img [src]="p.image" [alt]="p.productName" />
+      </div>
+      <p-divider />
+      <p class="detail-desc">{{ p.description }}</p>
+      <div class="detail-info">
+        <span><strong>Precio:</strong> ${{ p.price.toLocaleString() }}</span>
+        <span><strong>Stock:</strong> {{ p.stok }} unidades</span>
+      </div>
+    </div>
+  }
+</p-dialog>
