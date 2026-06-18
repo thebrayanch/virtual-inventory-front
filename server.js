@@ -2,15 +2,7 @@ const jsonServer = require('json-server');
 const server = jsonServer.create();
 const router = jsonServer.router('db.json');
 
-server.use((_req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  if (_req.method === 'OPTIONS') return res.sendStatus(200);
-  next();
-});
-
-server.use(jsonServer.bodyParser);
+server.use(jsonServer.defaults({ bodyParser: true }));
 
 server.post('/auth/login', (req, res) => {
   const { email, password } = req.body;
@@ -20,10 +12,7 @@ server.post('/auth/login', (req, res) => {
     return res.status(401).json({ message: 'Credenciales inválidas' });
   }
 
-  const payload = JSON.stringify({ sub: String(user.id), email: user.email, name: user.userName });
-  const token = `eyJ.${Buffer.from(payload).toString('base64')}.sig`;
-
-  res.json({ token });
+  res.json({ user: { id: user.id, userName: user.userName, email: user.email } });
 });
 
 server.post('/auth/register', (req, res) => {
@@ -35,10 +24,7 @@ server.post('/auth/register', (req, res) => {
   }
 
   const newUser = router.db.get('users').insert({ id: Date.now(), userName, email, password }).write();
-  const payload = JSON.stringify({ sub: String(newUser.id), email: newUser.email, name: newUser.userName });
-  const token = `eyJ.${Buffer.from(payload).toString('base64')}.sig`;
-
-  res.json({ token });
+  res.json({ user: { id: newUser.id, userName: newUser.userName, email: newUser.email } });
 });
 
 server.use(router);

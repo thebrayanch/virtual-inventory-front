@@ -1,0 +1,65 @@
+<div class="cart-page">
+  <h1 class="page-title">Carrito de Compras</h1>
+
+  @if (cart.items().length === 0) {
+    <div class="empty">
+      <i class="pi pi-shopping-cart empty-icon"></i>
+      <p>Tu carrito está vacío</p>
+      <button pButton label="Ver productos" icon="pi pi-arrow-left" [routerLink]="['/articulos']"></button>
+    </div>
+  } @else {
+    <div class="cart-content">
+      <div class="cart-items">
+        @for (item of cart.items(); track item.product.id) {
+          <div class="cart-item">
+            <div class="item-img">
+              <img [src]="item.product.image" [alt]="item.product.productName" loading="lazy" />
+            </div>
+            <div class="item-info">
+              <h3 class="item-name">{{ item.product.productName }}</h3>
+              <p class="item-price">${{ item.product.price.toLocaleString() }}</p>
+            </div>
+            <div class="item-qty">
+              <button
+                pButton
+                icon="pi pi-minus"
+                class="p-button-sm p-button-text"
+                (click)="cart.updateQuantity(item.product.id, item.quantity - 1)"
+                [disabled]="item.quantity <= 1"
+              ></button>
+              <span class="qty-value">{{ item.quantity }}</span>
+              <button
+                pButton
+                icon="pi pi-plus"
+                class="p-button-sm p-button-text"
+                (click)="cart.updateQuantity(item.product.id, item.quantity + 1)"
+              ></button>
+            </div>
+            <div class="item-subtotal">
+              ${{ (item.product.price * item.quantity).toLocaleString() }}
+            </div>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-sm p-button-danger p-button-text"
+              (click)="cart.removeItem(item.product.id)"
+            ></button>
+          </div>
+        }
+      </div>
+
+      <div class="cart-summary">
+        <h2>Resumen</h2>
+        <div class="summary-row">
+          <span>Productos:</span>
+          <span>{{ cart.count() }} artículos</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total:</span>
+          <span>${{ cart.total().toLocaleString() }}</span>
+        </div>
+        <button pButton label="Ir a comprar" icon="pi pi-shopping-cart" [routerLink]="['/articulos']" class="p-button-outlined w-full"></button>
+      </div>
+    </div>
+  }
+</div>
